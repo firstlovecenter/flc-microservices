@@ -1,5 +1,5 @@
 [build]
-  command = "npm i && cd functions/notify && npm i && cd .. && npm run encrypt-secrets && npm run inject-secrets "
+  command = "npm run doppler-install && npm i && cd functions/notify && npm i && cd .. && npm run encrypt-secrets && npm run inject-secrets "
   functions = "/functions"
 
 [[redirects]]
