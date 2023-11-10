@@ -1,8 +1,8 @@
 [build]
-  command = "npm i && cd notify && npm i"
-  functions = "/"
+  command = "npm i && cd functions/notify && npm i && cd .. && npm run encrypt-secrets && npm run inject-secrets "
+  functions = "/functions"
 
 [[redirects]]
-  from = "/graphql"
-  to = "/.netlify/functions/graphql"
+  from = "/notify"
+  to = "/.netlify/functions/notify"
   status = 200
