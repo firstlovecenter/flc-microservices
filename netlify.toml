@@ -1,8 +1,14 @@
 [build]
-  command = "npm run doppler-install && npm i && cd functions/notify && npm i && cd ../../ && npm run encrypt-secrets && npm run inject-secrets "
-  functions = "/functions"
+command = "npm run doppler-install && npm i && cd functions/notify && npm i && cd ../../ && npm run encrypt-secrets && npm run inject-secrets "
+functions = "/functions"
 
 [[redirects]]
-  from = "/notify"
-  to = "/.netlify/functions/notify"
-  status = 200
+from = "/notify"
+to = "/.netlify/functions/notify"
+status = 200
+
+
+[[redirects]]
+from = "/notify/send-sms"
+to = "/.netlify/functions/notify/send-sms"
+status = 200

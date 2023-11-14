@@ -32,6 +32,8 @@
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "express": "^4.18.2",
+    "form-data": "^4.0.0",
+    "mailgun.js": "^9.3.0",
     "serverless-http": "^3.2.0"
   },
   "devDependencies": {
