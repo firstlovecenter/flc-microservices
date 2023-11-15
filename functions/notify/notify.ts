@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import rateLimit from 'express-rate-limit'
 
 const { default: axios } = require('axios')
 const { loadSecrets } = require('./secrets.js')
@@ -64,7 +65,11 @@ router.post('/send-sms', async (request: Request, response: Response) => {
     response.status(502).send('There was a problem sending your message')
   }
 })
-
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+})
+app.use(limiter)
 app.use(cors({ origin: true }), bodyParser.json(), router)
 app.use('/.netlify/functions/notify', router)
 
