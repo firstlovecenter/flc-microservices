@@ -13,7 +13,7 @@ const app = express()
 export const router = express.Router()
 
 router.post('/send-sms', async (request: Request, response: Response) => {
-  const { recipient, message } = request.body
+  const { recipient, message, sender } = request.body
 
   if (!recipient) {
     response.status(400).send('Missing recipient')
@@ -35,7 +35,7 @@ router.post('/send-sms', async (request: Request, response: Response) => {
       recipient: SECRETS.TEST_PHONE_NUMBER
         ? [SECRETS.TEST_PHONE_NUMBER, '0594760323']
         : recipient,
-      sender: 'FLC Admin',
+      sender: sender || 'FLC Admin',
       message,
       is_schedule: 'false',
       schedule_date: '',
