@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 // import rateLimit from 'express-rate-limit'
 import { sendSMS } from './sendSMS'
 import { sendEmail } from './sendEmail'
+import { SECRETS } from './utils'
 
 const express = require('express')
 const serverless = require('serverless-http')
@@ -14,6 +15,12 @@ const router = express.Router()
 app.set('trust proxy', '127.0.0.1')
 
 router.post('/send-sms', async (request: Request, response: Response) => {
+  // TODO: Uncomment this after changing airtable script
+  // const secretKey = request.headers['x-secret-key']
+  // if (!secretKey || secretKey !== SECRETS.FLC_NOTIFY_KEY) {
+  //   return response.status(403).send('Unauthorized')
+  // }
+
   try {
     return sendSMS(request, response)
   } catch (error) {
@@ -24,6 +31,11 @@ router.post('/send-sms', async (request: Request, response: Response) => {
 })
 
 router.post('/send-email', async (request: Request, response: Response) => {
+  const secretKey = request.headers['x-secret-key']
+  if (!secretKey || secretKey !== SECRETS.FLC_NOTIFY_KEY) {
+    return response.status(403).send('Unauthorized')
+  }
+
   try {
     return sendEmail(request, response)
   } catch (error) {

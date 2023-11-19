@@ -13,12 +13,6 @@ export const sendEmail = async (
   request: Request<any, any, MailgunMessageData>,
   response: Response
 ) => {
-  const secretKey = request.headers['x-secret-key']
-  if (!secretKey || secretKey !== SECRETS.FLC_NOTIFY_KEY) {
-    response.status(403).send('Unauthorized')
-    return
-  }
-
   const { from, to, text, html, subject, template } = request.body
 
   const invalidReq = validateRequest(request.body, ['from', 'to'])
