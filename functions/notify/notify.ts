@@ -9,7 +9,7 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 
 const app = express()
-export const router = express.Router()
+const router = express.Router()
 
 router.post('/send-sms', async (request: Request, response: Response) => {
   try {

@@ -1,7 +1,6 @@
 import { MailgunMessageData } from 'mailgun.js'
-import { router } from './notify'
 import { validateRequest } from './utils'
-import { Response, Request, response } from 'express'
+import { Response, Request } from 'express'
 const { loadSecrets } = require('./secrets.js')
 const Mailgun = require('mailgun.js')
 const formData = require('form-data')
