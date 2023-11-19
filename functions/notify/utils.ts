@@ -1,5 +1,6 @@
 const { loadSecrets } = require('./secrets.js')
-export const SECRETS = loadSecrets()
+
+export const SECRETS = loadSecrets ? loadSecrets() : process.env
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const validateRequest = (request: any, requiredFields: string[]) => {
@@ -12,6 +13,4 @@ export const validateRequest = (request: any, requiredFields: string[]) => {
   return null
 }
 
-export const removeSpaces = (str: string) => {
-  return str.replace(/\s/g, '')
-}
+export const removeSpaces = (str: string) => str.replace(/\s/g, '')

@@ -1,10 +1,7 @@
-import { MailgunMessageData } from 'mailgun.js'
-import { validateRequest } from './utils'
+import Mailgun, { MailgunMessageData } from 'mailgun.js'
 import { Response, Request } from 'express'
-const { loadSecrets } = require('./secrets.js')
-const Mailgun = require('mailgun.js')
-const formData = require('form-data')
-const SECRETS = loadSecrets()
+import formData from 'form-data'
+import { SECRETS, validateRequest } from './utils'
 
 const mailgun = new Mailgun(formData)
 const mg = mailgun.client({
@@ -19,6 +16,7 @@ export const sendEmail = async (
   const secretKey = request.headers['x-secret-key']
   if (!secretKey || secretKey !== SECRETS.FLC_NOTIFY_KEY) {
     response.status(403).send('Unauthorized')
+    return
   }
 
   const { from, to, text, html, subject, template } = request.body
@@ -40,33 +38,24 @@ export const sendEmail = async (
     return
   }
 
+  const body = {
+    ...request.body,
+    't:variables': JSON.stringify(request.body['t:variables']),
+  }
+
   try {
-    console.log(
-      `🚀 ~ file: sendEmail.ts:49 ~  {
-      ...request.body,
-      from: from || 'FL Accra Admin <no-reply@firstlovecenter.org>',
-      to: to || 'test@email.com',
-    }`,
-      {
-        ...request.body,
-        from: from || 'FL Accra Admin <no-reply@firstlovecenter.org>',
-        to: to || 'test@email.com',
-      }
-    )
     const res = await mg.messages.create(SECRETS.MAILGUN_DOMAIN, {
-      ...request.body,
+      ...body,
       from: from || 'FL Accra Admin <no-reply@firstlovecenter.org>',
       to: to || 'test@email.com',
     })
 
     if (res.message === 'Queued. Thank you.') {
       response.status(200).send('Email Sent Successfully')
-      return
     }
-
-    return
   } catch (error) {
-    console.error('There was a problem sending your email', error)
-    response.status(502).send('There was a problem sending your email')
+    throw new Error(String(JSON.stringify(error)))
   }
 }
+
+export default sendEmail

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { SECRETS } from './utils'
+
 const { default: axios } = require('axios')
 
 export const sendSMS = async (request: Request, response: Response) => {
@@ -31,11 +32,9 @@ export const sendSMS = async (request: Request, response: Response) => {
   }
 
   try {
-    console.log('Sending SMS using mNotify')
     const res = await axios(sendMessage)
 
     if (res.data.code === '2000') {
-      console.log(res.data.message)
       response
         .status(200)
         .send(`SMS Sent Successfully ${JSON.stringify(res.data)}`)
@@ -49,3 +48,5 @@ export const sendSMS = async (request: Request, response: Response) => {
     throw new Error(String(error))
   }
 }
+
+export default sendSMS
