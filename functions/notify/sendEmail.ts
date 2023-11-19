@@ -35,7 +35,7 @@ export const sendEmail = async (
     return
   }
 
-  if (!text && !html) {
+  if (!text && !html && !template) {
     response.status(400).send('You must provide either body or html')
     return
   }
