@@ -50,9 +50,7 @@ router.post('/send-sms', async (request: Request, response: Response) => {
       console.log(res.data.message)
       response
         .status(200)
-        .send(
-          `There was a problem sending your SMS ${JSON.stringify(res.data)}`
-        )
+        .send(`SMS Sent Successfully ${JSON.stringify(res.data)}`)
       return
     }
 

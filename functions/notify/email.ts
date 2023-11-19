@@ -19,16 +19,23 @@ router.post(
     request: Request<any, any, MailgunMessageData>,
     response: Response
   ) => {
-    const { from, to, subject, text, html, cc, bcc } = request.body
+    const secretKey = request.headers['x-secret-key']
+    if (!secretKey || secretKey !== SECRETS.FLC_NOTIFY_KEY) {
+      response.status(403).send('Unauthorized')
+      return
+    }
 
-    const invalidReq = validateRequest(request.body, [
-      'sender',
-      'recipient',
-      'subject',
-    ])
+    const { from, to, text, html, subject, template } = request.body
+
+    const invalidReq = validateRequest(request.body, ['from', 'to'])
 
     if (invalidReq) {
       response.status(400).send(invalidReq)
+      return
+    }
+
+    if (!subject && !template) {
+      response.status(400).send('You must provide either subject or template')
       return
     }
 
@@ -39,15 +46,15 @@ router.post(
 
     try {
       const res = await mg.messages.create(SECRETS.MAILGUN_DOMAIN, {
+        ...request.body,
         from: from || 'FL Accra Admin <no-reply@firstlovecenter.org>',
         to: to || 'test@email.com',
-        subject,
-        text,
-        template: '',
-        html: html || undefined, // HTML Version of the Message for Better Styling
-        cc,
-        bcc,
       })
+
+      if (res.message === 'Queued. Thank you.') {
+        response.status(200).send('Email Sent Successfully')
+        return
+      }
 
       return
     } catch (error) {
