@@ -46,6 +46,7 @@ export const sendEmail = async (
       from: from || 'FL Accra Admin <no-reply@firstlovecenter.org>',
       to: to || 'test@email.com',
     })
+    console.log('🚀 ~ file: sendEmail.ts:49 ~ res:', res)
 
     if (res.message === 'Queued. Thank you.') {
       response.status(200).send('Email Sent Successfully')
