@@ -15,11 +15,10 @@ const router = express.Router()
 app.set('trust proxy', '127.0.0.1')
 
 router.post('/send-sms', async (request: Request, response: Response) => {
-  // TODO: Uncomment this after changing airtable script
-  // const secretKey = request.headers['x-secret-key']
-  // if (!secretKey || secretKey !== SECRETS.FLC_NOTIFY_KEY) {
-  //   return response.status(403).send('Unauthorized')
-  // }
+  const secretKey = request.headers['x-secret-key']
+  if (!secretKey || secretKey !== SECRETS.FLC_NOTIFY_KEY) {
+    return response.status(403).send('Unauthorized')
+  }
 
   try {
     return sendSMS(request, response)
