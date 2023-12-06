@@ -34,7 +34,10 @@ export const sendEmail = async (
 
   const body = {
     ...request.body,
-    't:variables': JSON.stringify(request.body['t:variables']),
+    't:variables':
+      typeof request.body['t:variables'] !== 'string'
+        ? JSON.stringify(request.body['t:variables'])
+        : request.body['t:variables'],
   }
 
   try {
