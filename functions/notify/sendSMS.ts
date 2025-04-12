@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { SECRETS } from './utils'
+import loadSecrets from './secrets'
 
 const { default: axios } = require('axios')
 
@@ -13,6 +13,8 @@ export const sendSMS = async (request: Request, response: Response) => {
   if (!message) {
     throw new Error('Missing message')
   }
+
+  const SECRETS = await loadSecrets()
 
   const sendMessage = {
     method: 'post',

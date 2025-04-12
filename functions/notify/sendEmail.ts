@@ -1,18 +1,21 @@
 import Mailgun, { MailgunMessageData } from 'mailgun.js'
 import { Response, Request } from 'express'
 import formData from 'form-data'
-import { SECRETS, validateRequest } from './utils'
+import { validateRequest } from './utils'
+import loadSecrets from './secrets'
 
 const mailgun = new Mailgun(formData)
-const mg = mailgun.client({
-  username: 'api',
-  key: SECRETS.MAILGUN_API_KEY,
-})
 
 export const sendEmail = async (
   request: Request<any, any, MailgunMessageData>,
   response: Response
 ) => {
+  const SECRETS = await loadSecrets()
+  const mg = mailgun.client({
+    username: 'api',
+    key: SECRETS.MAILGUN_API_KEY,
+  })
+
   const { from, to, text, html, subject, template } = request.body
 
   const invalidReq = validateRequest(request.body, ['from', 'to'])

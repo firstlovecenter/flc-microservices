@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 // import rateLimit from 'express-rate-limit'
 import { sendSMS } from './sendSMS'
 import { sendEmail } from './sendEmail'
-import { SECRETS } from './utils'
+import loadSecrets from './secrets'
 
 const express = require('express')
 const serverless = require('serverless-http')
@@ -16,6 +16,7 @@ app.set('trust proxy', '127.0.0.1')
 
 router.post('/send-sms', async (request: Request, response: Response) => {
   const secretKey = request.headers['x-secret-key']
+  const SECRETS = await loadSecrets()
   if (!secretKey || secretKey !== SECRETS.FLC_NOTIFY_KEY) {
     return response.status(403).send('Unauthorized')
   }
@@ -31,6 +32,7 @@ router.post('/send-sms', async (request: Request, response: Response) => {
 
 router.post('/send-email', async (request: Request, response: Response) => {
   const secretKey = request.headers['x-secret-key']
+  const SECRETS = await loadSecrets()
   if (!secretKey || secretKey !== SECRETS.FLC_NOTIFY_KEY) {
     return response.status(403).send('Unauthorized')
   }

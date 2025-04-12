@@ -2,10 +2,12 @@
   "name": "flc-notify-service",
   "version": "1.0.0",
   "description": "Suite of tools for use across flc projects",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "prebuild": "npm run clean",
     "build": "tsc",
+    "build:watch": "tsc -w",
     "start": "doppler run netlify dev",
     "release:major": "npm run clean:git && node scripts/release.js major",
     "release:minor": "npm run clean:git && node scripts/release.js minor",

@@ -1,7 +1,3 @@
-const { loadSecrets } = require('./secrets.js')
-
-export const SECRETS = loadSecrets ? loadSecrets() : process.env
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const validateRequest = (request: any, requiredFields: string[]) => {
   const missingFields = requiredFields.filter((field) => !request[field])
