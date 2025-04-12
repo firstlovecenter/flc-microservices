@@ -53,7 +53,6 @@ router.post('/send-email', async (request: Request, response: Response) => {
 
 // app.use(limiter)
 app.use(cors({ origin: true }), bodyParser.json(), router)
-app.use('/.netlify/functions/notify', router)
 
 export const handler = serverless(app)
 
