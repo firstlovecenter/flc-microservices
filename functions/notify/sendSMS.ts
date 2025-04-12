@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import loadSecrets from './secrets'
+import { loadSecrets } from './secrets'
 
 const { default: axios } = require('axios')
 

@@ -2,7 +2,7 @@ import { Request, Response } from 'express'
 // import rateLimit from 'express-rate-limit'
 import { sendSMS } from './sendSMS'
 import { sendEmail } from './sendEmail'
-import loadSecrets from './secrets'
+import { loadSecrets } from './secrets'
 
 const express = require('express')
 const serverless = require('serverless-http')

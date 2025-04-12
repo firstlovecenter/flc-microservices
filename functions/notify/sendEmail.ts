@@ -2,7 +2,7 @@ import Mailgun, { MailgunMessageData } from 'mailgun.js'
 import { Response, Request } from 'express'
 import formData from 'form-data'
 import { validateRequest } from './utils'
-import loadSecrets from './secrets'
+import { loadSecrets } from './secrets'
 
 const mailgun = new Mailgun(formData)
 

@@ -51,6 +51,5 @@ export const loadSecrets = async (): Promise<Record<string, string>> => {
   return secrets
 }
 
-module.exports = { loadSecrets }
-
-export default loadSecrets
+// Remove the default export to avoid confusion
+// export default loadSecrets
