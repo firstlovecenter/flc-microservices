@@ -73,7 +73,10 @@ export const sendSMS = async (request: Request, response: Response) => {
       return response.status(502).json({
         success: false,
         error: 'SMS provider connection error',
-        message: error.message || 'Failed to connect to SMS provider',
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Failed to connect to SMS provider',
         data: error.response?.data,
       })
     }
