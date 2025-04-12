@@ -76,6 +76,7 @@ router.get('/health', (request: Request, response: Response) => {
 
 // app.use(limiter)
 app.use(cors({ origin: true }), bodyParser.json(), router)
+app.use('/', router)
 
 // eslint-disable-next-line import/prefer-default-export
 export const handler = serverless(app)
