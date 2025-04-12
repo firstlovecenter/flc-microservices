@@ -18,23 +18,34 @@ export const sendEmail = async (
 
   const { from, to, text, html, subject, template } = request.body
 
+  // Validate required fields
   const invalidReq = validateRequest(request.body, ['from', 'to'])
-
   if (invalidReq) {
-    response.status(400).send(invalidReq)
-    return
+    return response.status(400).json({
+      success: false,
+      error: 'Validation error',
+      message: invalidReq,
+    })
   }
 
+  // Validate content requirements
   if (!subject && !template) {
-    response.status(400).send('You must provide either subject or template')
-    return
+    return response.status(400).json({
+      success: false,
+      error: 'Validation error',
+      message: 'You must provide either subject or template',
+    })
   }
 
   if (!text && !html && !template) {
-    response.status(400).send('You must provide either body or html')
-    return
+    return response.status(400).json({
+      success: false,
+      error: 'Validation error',
+      message: 'You must provide either body text, HTML content, or a template',
+    })
   }
 
+  // Process template variables
   const body = {
     ...request.body,
     't:variables':
@@ -51,10 +62,55 @@ export const sendEmail = async (
     })
 
     if (res.message === 'Queued. Thank you.') {
-      response.status(200).send('Email Sent Successfully')
+      return response.status(200).json({
+        success: true,
+        message: 'Email sent successfully',
+        data: { id: res.id },
+      })
     }
+    // For unexpected response formats
+    return response.status(502).json({
+      success: false,
+      error: 'Email provider error',
+      message: 'Unexpected response from email provider',
+      data: res,
+    })
   } catch (error) {
-    throw new Error(String(JSON.stringify(error)))
+    console.error('Email sending error details:', error)
+
+    // Handle specific Mailgun errors if possible
+    if (error instanceof Error) {
+      // Check if it's a Mailgun API error with structured data
+      const errorData = error.message
+        && error.message.startsWith('{')
+        && error.message.endsWith('}')
+        ? JSON.parse(error.message)
+        : null
+
+      if (errorData) {
+        return response.status(502).json({
+          success: false,
+          error: 'Email provider error',
+          message: errorData.message || 'Failed to send email',
+          code: errorData.statusCode,
+          details: errorData,
+        })
+      }
+
+      // Generic error handling
+      return response.status(500).json({
+        success: false,
+        error: 'Email delivery failed',
+        message: error.message,
+      })
+    }
+
+    // Fallback for unknown error types
+    return response.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: 'Unknown error occurred while sending email',
+    })
   }
 }
 

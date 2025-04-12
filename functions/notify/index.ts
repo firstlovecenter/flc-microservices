@@ -18,15 +18,23 @@ router.post('/send-sms', async (request: Request, response: Response) => {
   const secretKey = request.headers['x-secret-key']
   const SECRETS = await loadSecrets()
   if (!secretKey || secretKey !== SECRETS.FLC_NOTIFY_KEY) {
-    return response.status(403).send('Unauthorized')
+    return response.status(403).json({
+      success: false,
+      error: 'Unauthorized access',
+      message: 'Invalid or missing API key',
+    })
   }
 
   try {
     return sendSMS(request, response)
   } catch (error) {
-    return response
-      .status(502)
-      .send(`There was a problem sending your message ${error}`)
+    console.error('SMS sending error:', error)
+    return response.status(502).json({
+      success: false,
+      error: 'SMS delivery failed',
+      message:
+        error instanceof Error ? error.message : 'Unknown error occurred',
+    })
   }
 })
 
@@ -34,15 +42,23 @@ router.post('/send-email', async (request: Request, response: Response) => {
   const secretKey = request.headers['x-secret-key']
   const SECRETS = await loadSecrets()
   if (!secretKey || secretKey !== SECRETS.FLC_NOTIFY_KEY) {
-    return response.status(403).send('Unauthorized')
+    return response.status(403).json({
+      success: false,
+      error: 'Unauthorized access',
+      message: 'Invalid or missing API key',
+    })
   }
 
   try {
     return sendEmail(request, response)
   } catch (error) {
-    return response
-      .status(502)
-      .send(`There was a problem sending your email ${error}`)
+    console.error('Email sending error:', error)
+    return response.status(502).json({
+      success: false,
+      error: 'Email delivery failed',
+      message:
+        error instanceof Error ? error.message : 'Unknown error occurred',
+    })
   }
 })
 

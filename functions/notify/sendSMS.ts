@@ -6,13 +6,25 @@ const { default: axios } = require('axios')
 export const sendSMS = async (request: Request, response: Response) => {
   const { recipient, message, sender } = request.body
 
+  // Validate required fields
   if (!recipient) {
-    throw new Error('Missing recipient')
+    return response.status(400).json({
+      success: false,
+      error: 'Validation error',
+      message: 'Missing recipient field',
+    })
   }
 
   if (!message) {
-    throw new Error('Missing message')
+    return response.status(400).json({
+      success: false,
+      error: 'Validation error',
+      message: 'Missing message field',
+    })
   }
+
+  // Format phone numbers if needed (add validation here if necessary)
+  const recipients = Array.isArray(recipient) ? recipient : [recipient]
 
   const SECRETS = await loadSecrets()
 
@@ -25,7 +37,7 @@ export const sendSMS = async (request: Request, response: Response) => {
     data: {
       recipient: SECRETS.TEST_PHONE_NUMBER
         ? [SECRETS.TEST_PHONE_NUMBER, '0594760323']
-        : recipient,
+        : recipients,
       sender: sender || 'FLC Admin',
       message,
       is_schedule: 'false',
@@ -37,17 +49,44 @@ export const sendSMS = async (request: Request, response: Response) => {
     const res = await axios(sendMessage)
 
     if (res.data.code === '2000') {
-      response
-        .status(200)
-        .send(`SMS Sent Successfully ${JSON.stringify(res.data)}`)
-      return
+      return response.status(200).json({
+        success: true,
+        message: 'SMS sent successfully',
+        data: res.data,
+      })
     }
 
-    throw new Error(
-      `There was a problem sending your SMS ${JSON.stringify(res.data)}`
-    )
+    // API returned an error code
+    return response.status(502).json({
+      success: false,
+      error: 'SMS provider error',
+      message: `Failed to send SMS: ${
+        res.data.message || 'Unknown provider error'
+      }`,
+      data: res.data,
+    })
   } catch (error) {
-    throw new Error(String(error))
+    console.error('SMS send error details:', error)
+
+    // Handle network errors or other axios errors
+    if (axios.isAxiosError(error)) {
+      return response.status(502).json({
+        success: false,
+        error: 'SMS provider connection error',
+        message: error.message || 'Failed to connect to SMS provider',
+        data: error.response?.data,
+      })
+    }
+
+    // Handle other unexpected errors
+    return response.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message:
+        error instanceof Error
+          ? error.message
+          : 'Unknown error occurred while sending SMS',
+    })
   }
 }
 
