@@ -10,6 +10,7 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 
 const app = express()
+const router = express.Router()
 
 // Configure middleware
 app.use(cors({ origin: true }))
@@ -19,7 +20,7 @@ app.use(bodyParser.json())
 app.set('trust proxy', '127.0.0.1')
 
 // Health check endpoint
-app.get('/', (request: Request, response: Response) => {
+router.get('/', (request: Request, response: Response) => {
   response.status(200).json({
     success: true,
     message: 'Service is healthy',
@@ -27,7 +28,7 @@ app.get('/', (request: Request, response: Response) => {
 })
 
 // SMS endpoint
-app.post('/send-sms', async (request: Request, response: Response) => {
+router.post('/send-sms', async (request: Request, response: Response) => {
   const secretKey = request.headers['x-secret-key']
   const SECRETS = await loadSecrets()
   if (!secretKey || secretKey !== SECRETS.FLC_NOTIFY_KEY) {
@@ -52,7 +53,7 @@ app.post('/send-sms', async (request: Request, response: Response) => {
 })
 
 // Email endpoint
-app.post('/send-email', async (request: Request, response: Response) => {
+router.post('/send-email', async (request: Request, response: Response) => {
   const secretKey = request.headers['x-secret-key']
   const SECRETS = await loadSecrets()
   if (!secretKey || secretKey !== SECRETS.FLC_NOTIFY_KEY) {
@@ -76,6 +77,9 @@ app.post('/send-email', async (request: Request, response: Response) => {
   }
 })
 
+// Register the router
+app.use('/', router)
+
 // Catch-all route
 app.use('*', (_req: Request, res: Response) => {
   res.status(404).json({
@@ -85,6 +89,6 @@ app.use('*', (_req: Request, res: Response) => {
   })
 })
 
-// Create serverless handler with configuration options
+// Create serverless handler with more flexible configuration
 // eslint-disable-next-line import/prefer-default-export
 export const handler = serverless(app)
