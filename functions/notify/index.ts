@@ -10,13 +10,24 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 
 const app = express()
-const router = express.Router()
 
-app.use(cors({ origin: true }), bodyParser.json(), router)
+// Configure middleware
+app.use(cors({ origin: true }))
+app.use(bodyParser.json())
 
+// Set trusted proxy
 app.set('trust proxy', '127.0.0.1')
 
-router.post('/send-sms', async (request: Request, response: Response) => {
+// Health check endpoint
+app.get('/', (request: Request, response: Response) => {
+  response.status(200).json({
+    success: true,
+    message: 'Service is healthy',
+  })
+})
+
+// SMS endpoint
+app.post('/send-sms', async (request: Request, response: Response) => {
   const secretKey = request.headers['x-secret-key']
   const SECRETS = await loadSecrets()
   if (!secretKey || secretKey !== SECRETS.FLC_NOTIFY_KEY) {
@@ -30,7 +41,7 @@ router.post('/send-sms', async (request: Request, response: Response) => {
   try {
     return sendSMS(request, response)
   } catch (error) {
-    console.error('SMS sending error:', error)
+    // Log error details
     return response.status(502).json({
       success: false,
       error: 'SMS delivery failed',
@@ -40,7 +51,8 @@ router.post('/send-sms', async (request: Request, response: Response) => {
   }
 })
 
-router.post('/send-email', async (request: Request, response: Response) => {
+// Email endpoint
+app.post('/send-email', async (request: Request, response: Response) => {
   const secretKey = request.headers['x-secret-key']
   const SECRETS = await loadSecrets()
   if (!secretKey || secretKey !== SECRETS.FLC_NOTIFY_KEY) {
@@ -54,7 +66,7 @@ router.post('/send-email', async (request: Request, response: Response) => {
   try {
     return sendEmail(request, response)
   } catch (error) {
-    console.error('Email sending error:', error)
+    // Log error details
     return response.status(502).json({
       success: false,
       error: 'Email delivery failed',
@@ -64,22 +76,15 @@ router.post('/send-email', async (request: Request, response: Response) => {
   }
 })
 
-router.get('/', (request: Request, response: Response) => {
-  response.status(200).json({
-    success: true,
-    message: 'Service is healthy',
+// Catch-all route
+app.use('*', (_req: Request, res: Response) => {
+  res.status(404).json({
+    success: false,
+    error: 'Route not found',
+    message: 'The requested endpoint does not exist',
   })
 })
 
-// const limiter = rateLimit({
-//   windowMs: 15 * 60 * 1000, // 15 minutes
-//   max: 100, // limit each IP to 100 requests per windowMs
-// })
-
-// Catch-all route
-app.get('*', (_req: Request, res: Response) => {
-  res.status(404).json('Route not found here or anywhere!')
-})
-
+// Create serverless handler with configuration options
 // eslint-disable-next-line import/prefer-default-export
 export const handler = serverless(app)
