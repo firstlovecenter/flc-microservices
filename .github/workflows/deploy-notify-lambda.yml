@@ -73,5 +73,5 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_CHANNEL: deployments
           SLACK_COLOR: ${{ job.status }}
-          SLACK_TITLE: '🚀 FLC Notify Service Lambda Deployment'
+          SLACK_TITLE: '🔔 FLC Notify Service Lambda Deployment'
           SLACK_MESSAGE: 'Deploying Notify Service to AWS Lambda ${{ job.status }}'
