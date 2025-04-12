@@ -38,7 +38,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION || 'eu-west-2' }}
-      
+
       - name: Prepare Lambda package
         run: |
           # Create a temporary directory for the Lambda package
@@ -53,7 +53,7 @@ jobs:
 
           # Copy package.json and install production dependencies
           cp functions/notify/package.json lambda-package/
-          cd lambda-package && npm ci --production
+          cd lambda-package && npm install --omit=dev
 
       - name: Create deployment package
         run: |
