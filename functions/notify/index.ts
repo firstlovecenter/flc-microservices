@@ -7,14 +7,13 @@ import { loadSecrets } from './secrets'
 const express = require('express')
 const serverless = require('serverless-http')
 const cors = require('cors')
-const bodyParser = require('body-parser')
 
 const app = express()
 const router = express.Router()
 
 // Configure middleware
 app.use(cors({ origin: true }))
-app.use(bodyParser.json())
+app.use(express.json())
 
 // Set trusted proxy
 app.set('trust proxy', '127.0.0.1')
