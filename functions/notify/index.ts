@@ -5,12 +5,14 @@ import { sendEmail } from './sendEmail'
 import { loadSecrets } from './secrets'
 
 const express = require('express')
-// const serverless = require('serverless-http')
+const serverless = require('serverless-http')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 
 const app = express()
 const router = express.Router()
+
+app.use(cors({ origin: true }), bodyParser.json(), router)
 
 app.set('trust proxy', '127.0.0.1')
 
@@ -62,7 +64,7 @@ router.post('/send-email', async (request: Request, response: Response) => {
   }
 })
 
-router.get('/health', (request: Request, response: Response) => {
+router.get('/', (request: Request, response: Response) => {
   response.status(200).json({
     success: true,
     message: 'Service is healthy',
@@ -74,18 +76,10 @@ router.get('/health', (request: Request, response: Response) => {
 //   max: 100, // limit each IP to 100 requests per windowMs
 // })
 
-// app.use(limiter)
-app.use(cors({ origin: true }), bodyParser.json(), router)
-app.use('/', router)
-
-// export const handler = serverless(app)
+// Catch-all route
+app.get('*', (_req: Request, res: Response) => {
+  res.status(404).json('Route not found here or anywhere!')
+})
 
 // eslint-disable-next-line import/prefer-default-export
-export const handler = async (event: any) => ({
-  statusCode: 200,
-  body: JSON.stringify({
-    success: true,
-    path: event.rawPath,
-    message: 'Hello from Lambda',
-  }),
-})
+export const handler = serverless(app)
