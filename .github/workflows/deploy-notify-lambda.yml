@@ -1,0 +1,93 @@
+name: Deploy Notify Function to AWS Lambda
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'functions/notify/**' # Only trigger when notify function files change
+
+jobs:
+  deploy:
+    name: Deploy to AWS Lambda
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: '**/package.json'
+
+      - name: Install dependencies (root)
+        run: npm ci
+
+      - name: Install dependencies (notify function)
+        run: cd functions/notify && npm ci
+
+      - name: Build TypeScript
+        run: |
+          cd functions/notify
+          npm run build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'eu-west-2' }}
+      
+      - name: Prepare Lambda package
+        run: |
+          # Create a temporary directory for the Lambda package
+          mkdir -p lambda-package
+
+          # Copy the compiled JavaScript files
+          cp -r functions/notify/*.js lambda-package/
+
+          # Copy the secrets loader
+          mkdir -p lambda-package/lib
+          cp lib/secrets.js lambda-package/lib/
+
+          # Copy .env file
+          cp functions/notify/.env lambda-package/
+
+          # Copy package.json and install production dependencies
+          cp functions/notify/package.json lambda-package/
+          cd lambda-package && npm ci --production
+
+      - name: Create deployment package
+        run: |
+          cd lambda-package
+          zip -r ../notify-lambda.zip .
+
+      - name: Deploy to Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name flc-notify-service \
+            --zip-file fileb://notify-lambda.zip
+
+      - name: Update Lambda environment variables
+        run: |
+          aws lambda update-function-configuration \
+            --function-name flc-notify-service \
+            --environment "Variables={AWS_SECRET_NAME=${{ secrets.AWS_SECRET_NAME || 'flc-microservices' }}}"
+
+      - name: Verify Lambda IAM Role has Secrets Manager permissions
+        run: |
+          echo "NOTE: Ensure your Lambda function's execution role has permission to access AWS Secrets Manager"
+          echo "Required Policy: secretsmanager:GetSecretValue for the specific secret ARN"
+
+      - name: Notify deployment status
+        if: always()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_CHANNEL: deployments
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_TITLE: '🚀 FLC Notify Service Lambda Deployment'
+          SLACK_MESSAGE: 'Deploying Notify Service to AWS Lambda ${{ job.status }}'
