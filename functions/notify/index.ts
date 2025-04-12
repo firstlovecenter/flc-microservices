@@ -5,7 +5,7 @@ import { sendEmail } from './sendEmail'
 import { loadSecrets } from './secrets'
 
 const express = require('express')
-// const serverless = require('serverless-http')
+const serverless = require('serverless-http')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 
@@ -70,14 +70,5 @@ router.post('/send-email', async (request: Request, response: Response) => {
 // app.use(limiter)
 app.use(cors({ origin: true }), bodyParser.json(), router)
 
-// export const handler = serverless(app)
-
 // eslint-disable-next-line import/prefer-default-export
-export const handler = async (event: any) => ({
-  statusCode: 200,
-  body: JSON.stringify({
-    success: true,
-    path: event.rawPath,
-    message: 'Hello from Lambda',
-  }),
-})
+export const handler = serverless(app)
