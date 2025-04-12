@@ -3,9 +3,7 @@ name: Deploy Notify Function to AWS Lambda
 on:
   push:
     branches:
-      - main
-    paths:
-      - 'functions/notify/**' # Only trigger when notify function files change
+      - master
 
 jobs:
   deploy:
@@ -70,17 +68,6 @@ jobs:
           aws lambda update-function-code \
             --function-name flc-notify-service \
             --zip-file fileb://notify-lambda.zip
-
-      - name: Update Lambda environment variables
-        run: |
-          aws lambda update-function-configuration \
-            --function-name flc-notify-service \
-            --environment "Variables={AWS_SECRET_NAME=${{ secrets.AWS_SECRET_NAME || 'flc-microservices' }}}"
-
-      - name: Verify Lambda IAM Role has Secrets Manager permissions
-        run: |
-          echo "NOTE: Ensure your Lambda function's execution role has permission to access AWS Secrets Manager"
-          echo "Required Policy: secretsmanager:GetSecretValue for the specific secret ARN"
 
       - name: Notify deployment status
         if: always()
