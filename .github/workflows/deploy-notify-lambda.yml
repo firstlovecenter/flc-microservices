@@ -51,9 +51,6 @@ jobs:
           mkdir -p lambda-package/lib
           cp lib/secrets.js lambda-package/lib/
 
-          # Copy .env file
-          cp functions/notify/.env lambda-package/
-
           # Copy package.json and install production dependencies
           cp functions/notify/package.json lambda-package/
           cd lambda-package && npm ci --production
