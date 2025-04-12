@@ -62,6 +62,13 @@ router.post('/send-email', async (request: Request, response: Response) => {
   }
 })
 
+router.get('/health', (request: Request, response: Response) => {
+  response.status(200).json({
+    success: true,
+    message: 'Service is healthy',
+  })
+})
+
 // const limiter = rateLimit({
 //   windowMs: 15 * 60 * 1000, // 15 minutes
 //   max: 100, // limit each IP to 100 requests per windowMs
