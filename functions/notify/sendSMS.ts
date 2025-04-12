@@ -77,7 +77,7 @@ export const sendSMS = async (request: Request, response: Response) => {
           error instanceof Error
             ? error.message
             : 'Failed to connect to SMS provider',
-        data: error.response?.data,
+        data: (error as any).response?.data,
       })
     }
 
