@@ -1,5 +1,5 @@
 {
-  "name": "microservices",
+  "name": "flc-notify-service",
   "version": "1.0.0",
   "description": "Suite of tools for use across flc projects",
   "main": "index.js",
@@ -7,9 +7,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "start": "doppler run netlify dev",
-    "doppler-install": "(curl -Ls https://cli.doppler.com/install.sh || wget -qO- https://cli.doppler.com/install.sh) | sh -s -- --no-install --no-package-manager",
-    "encrypt-secrets": "./doppler run node scripts/encrypt-secrets.js",
-    "inject-secrets": "./doppler run node scripts/inject-secrets.js",
     "release:major": "npm run clean:git && node scripts/release.js major",
     "release:minor": "npm run clean:git && node scripts/release.js minor",
     "release:patch": "npm run clean:git && node scripts/release.js patch",
@@ -23,17 +20,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/firstlovecenter/microservices.git"
+    "url": "git+https://github.com/firstlovecenter/flc-notify-service.git"
   },
   "keywords": [
-    "microservices"
+    "flc-notify-service"
   ],
   "author": "John-Dag Addy",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/firstlovecenter/microservices/issues"
+    "url": "https://github.com/firstlovecenter/flc-notify-service/issues"
   },
-  "homepage": "https://github.com/firstlovecenter/microservices#readme",
+  "homepage": "https://github.com/firstlovecenter/flc-notify-service#readme",
   "dependencies": {
     "axios": "^1.6.1",
     "body-parser": "^1.20.2",
